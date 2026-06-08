@@ -1,6 +1,8 @@
 # SVG Controls
 
 A lightweight, vanilla JavaScript library that adds **zoom**, **pan**, **element selection**, and **reset** capabilities to any SVG embedded via `<object>` tag. Perfect for diagrams, maps, floor plans, or any interactive SVG.
+	
+**Repository**: [https://github.com/arce/svg-controls](https://github.com/arce/svg-controls)
 
 ## Features
 
