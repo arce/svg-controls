@@ -7,10 +7,14 @@
     callbacks: { zoom: null, pan: null, select: null }
   };
 
+  // Fix #5: support multiple SVG objects per page
   const run = () => {
-    const obj = document.querySelector('object[type="image/xml+svg"], object[type="image/svg+xml"]');
-    if (!obj) return;
+    const objects = document.querySelectorAll('object[type="image/xml+svg"], object[type="image/svg+xml"]');
+    if (!objects.length) return;
+    objects.forEach(setupObject);
+  };
 
+  const setupObject = (obj) => {
     let cleanup = null;
 
     const setup = () => {
@@ -21,7 +25,7 @@
         console.error('CORS error: Cannot access contentDocument', err);
         return;
       }
-      
+
       if (!svgDoc) return;
       const svg = svgDoc.documentElement;
       if (!svg || svg.tagName.toLowerCase() !== 'svg') return;
@@ -74,8 +78,9 @@
         zoom: (factor, clientX, clientY) => {
           if (!state.zoomEnabled) return;
           const rect = obj.getBoundingClientRect();
-          const x = clientX || rect.left + rect.width / 2;
-          const y = clientY || rect.top + rect.height / 2;
+          // Fix #3: use ?? instead of || to handle clientX/clientY === 0
+          const x = clientX ?? rect.left + rect.width / 2;
+          const y = clientY ?? rect.top + rect.height / 2;
           const pt = getSvgPoint(x, y);
           if (!pt) return;
 
@@ -87,8 +92,11 @@
         },
         pan: (dx, dy) => {
           if (!state.panEnabled) return;
-          const scaleX = vb.width / obj.clientWidth;
-          const scaleY = vb.height / obj.clientHeight;
+          // Fix #6: guard against division by zero
+          const clientW = obj.clientWidth || 1;
+          const clientH = obj.clientHeight || 1;
+          const scaleX = vb.width / clientW;
+          const scaleY = vb.height / clientH;
           vb.x -= dx * scaleX;
           vb.y -= dy * scaleY;
           if (state.callbacks.pan) state.callbacks.pan(dx, dy);
@@ -117,7 +125,8 @@
           } else {
             selected = null;
           }
-          if (state.callbacks.select) state.callbacks.select(selected);
+          // Fix #7: pass id string instead of DOM element
+          if (state.callbacks.select) state.callbacks.select(selected?.id ?? null);
         },
         reset: () => {
           vb.x = originalVB.x;
@@ -140,25 +149,16 @@
       let clickTarget = null;
       const onPointerDown = (e) => {
         clickTarget = e.target;
-        svg.setPointerCapture && svg.setPointerCapture(e.pointerId);
         if (e.button !== 0) return;
         panning = true;
         isDragging = false;
         panStart = { x: e.clientX, y: e.clientY };
         clickStart = { x: e.clientX, y: e.clientY, time: Date.now() };
         svg.style.cursor = 'grabbing';
-        svg.setPointerCapture(e.pointerId);
+        // Fix #2: call setPointerCapture only once, with existence guard
+        if (svg.setPointerCapture) svg.setPointerCapture(e.pointerId);
       };
 
-	  const onClick = (e) => {
-	    const el = clickTarget || e.target; 
-	    let node = el;
-	    while (node && node !== svg && !node.id) node = node.parentNode;
-	    const targetId = node && node !== svg ? node.id : null;
-	    API.select(targetId);
-	    clickTarget = null;
-	  };
-	  
       const onPointerMove = (e) => {
         if (!panning) return;
         const dx = e.clientX - panStart.x;
@@ -172,14 +172,26 @@
         if (!panning) return;
         panning = false;
         svg.style.cursor = 'default';
-        svg.releasePointerCapture(e.pointerId);
-        
+        // Fix #4: guard releasePointerCapture
+        if (svg.releasePointerCapture) svg.releasePointerCapture(e.pointerId);
+        // Fix #1: selection is handled entirely by onClick; no select call here
+      };
+
+      // Fix #1: single selection handler using clickTarget captured at pointerdown
+      // Fix #8: consistent 2-space indentation
+      const onClick = (e) => {
         const dist = Math.hypot(e.clientX - clickStart.x, e.clientY - clickStart.y);
         const duration = Date.now() - clickStart.time;
-        if (!isDragging && dist < 6 && duration < 500) {
-          const targetId = e.target && e.target.id ? e.target.id : null;
-          API.select(targetId);
+        if (isDragging || dist >= 6 || duration >= 500) {
+          clickTarget = null;
+          return;
         }
+        const el = clickTarget || e.target;
+        let node = el;
+        while (node && node !== svg && !node.id) node = node.parentNode;
+        const targetId = node && node !== svg ? node.id : null;
+        API.select(targetId);
+        clickTarget = null;
       };
 
       const onDblClick = () => API.reset();

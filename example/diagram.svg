@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+
+  <!-- Background -->
+  <rect width="800" height="600" fill="#f0f4f8"/>
+
+  <!-- Title -->
+  <text x="400" y="36" text-anchor="middle" font-family="sans-serif" font-size="20" font-weight="bold" fill="#1a202c">Network Architecture</text>
+
+  <!-- ── Connections ── -->
+  <!-- Internet → Load Balancer -->
+  <line x1="400" y1="110" x2="400" y2="158" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,3"/>
+  <!-- Load Balancer → Server A -->
+  <line x1="330" y1="210" x2="200" y2="288" stroke="#94a3b8" stroke-width="2"/>
+  <!-- Load Balancer → Server B -->
+  <line x1="400" y1="215" x2="400" y2="288" stroke="#94a3b8" stroke-width="2"/>
+  <!-- Load Balancer → Server C -->
+  <line x1="470" y1="210" x2="600" y2="288" stroke="#94a3b8" stroke-width="2"/>
+  <!-- Server A → Database -->
+  <line x1="170" y1="345" x2="200" y2="418" stroke="#94a3b8" stroke-width="2"/>
+  <!-- Server B → Database -->
+  <line x1="390" y1="345" x2="250" y2="418" stroke="#94a3b8" stroke-width="2"/>
+  <!-- Server C → Database -->
+  <line x1="600" y1="345" x2="580" y2="418" stroke="#94a3b8" stroke-width="2"/>
+  <!-- Server A → Cache -->
+  <line x1="230" y1="345" x2="540" y2="418" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,3"/>
+  <!-- Server B → Cache -->
+  <line x1="420" y1="345" x2="545" y2="418" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,3"/>
+  <!-- Server C → Cache -->
+  <line x1="615" y1="345" x2="610" y2="418" stroke="#94a3b8" stroke-width="2" stroke-dasharray="6,3"/>
+  <!-- Database → Storage -->
+  <line x1="280" y1="478" x2="370" y2="535" stroke="#94a3b8" stroke-width="2"/>
+  <!-- Cache → Storage -->
+  <line x1="560" y1="478" x2="430" y2="535" stroke="#94a3b8" stroke-width="2"/>
+
+  <!-- ── Nodes ── -->
+
+  <!-- Internet -->
+  <g id="internet">
+    <circle cx="400" cy="82" r="30" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+    <text x="400" y="77" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#1e40af">🌐</text>
+    <text x="400" y="90" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#1e40af">Internet</text>
+  </g>
+
+  <!-- Load Balancer -->
+  <g id="load-balancer">
+    <rect x="320" y="158" width="160" height="54" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+    <text x="400" y="180" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#4c1d95">Load Balancer</text>
+    <text x="400" y="197" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#6d28d9">nginx · round-robin</text>
+  </g>
+
+  <!-- Server A -->
+  <g id="server-a">
+    <rect x="130" y="288" width="100" height="57" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+    <text x="180" y="311" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#14532d">Server A</text>
+    <text x="180" y="328" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#15803d">Node.js · 4 CPU</text>
+  </g>
+
+  <!-- Server B -->
+  <g id="server-b">
+    <rect x="350" y="288" width="100" height="57" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+    <text x="400" y="311" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#14532d">Server B</text>
+    <text x="400" y="328" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#15803d">Node.js · 4 CPU</text>
+  </g>
+
+  <!-- Server C -->
+  <g id="server-c">
+    <rect x="555" y="288" width="100" height="57" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+    <text x="605" y="311" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#14532d">Server C</text>
+    <text x="605" y="328" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#15803d">Node.js · 4 CPU</text>
+  </g>
+
+  <!-- Database -->
+  <g id="database">
+    <ellipse cx="280" cy="448" rx="80" ry="30" fill="#fef9c3" stroke="#ca8a04" stroke-width="2"/>
+    <ellipse cx="280" cy="438" rx="80" ry="20" fill="#fef08a" stroke="#ca8a04" stroke-width="2"/>
+    <text x="280" y="442" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#713f12">PostgreSQL</text>
+    <text x="280" y="458" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#92400e">primary · replica</text>
+  </g>
+
+  <!-- Cache -->
+  <g id="cache">
+    <ellipse cx="580" cy="448" rx="70" ry="30" fill="#ffedd5" stroke="#ea580c" stroke-width="2"/>
+    <ellipse cx="580" cy="438" rx="70" ry="20" fill="#fed7aa" stroke="#ea580c" stroke-width="2"/>
+    <text x="580" y="442" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#7c2d12">Redis</text>
+    <text x="580" y="458" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#9a3412">cache · sessions</text>
+  </g>
+
+  <!-- Storage -->
+  <g id="storage">
+    <rect x="340" y="528" width="120" height="50" rx="8" fill="#e0f2fe" stroke="#0284c7" stroke-width="2"/>
+    <text x="400" y="549" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#0c4a6e">Object Storage</text>
+    <text x="400" y="566" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#075985">S3-compatible</text>
+  </g>
+
+</svg>

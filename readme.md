@@ -2,7 +2,7 @@
 
 A lightweight, vanilla JavaScript library that adds **zoom**, **pan**, **element selection**, and **reset** capabilities to any SVG embedded via `<object>` tag. Perfect for diagrams, maps, floor plans, or any interactive SVG.
 
-**Repository**: [https://github.com/arce/svg-controls](https://github.com/arce/svg-controls)
+**Repository**: [https://github.com/arce/svg-controls](https://github.com/arce/svg-controls) &nbsp;·&nbsp; **[Live Example](example/index.html)**
 
 ## Features
 
@@ -32,7 +32,7 @@ Include the script in your HTML **after** the `<object>` element (or anywhere, a
 <object id="mySvg" data="diagram.svg" type="image/svg+xml"></object>
 ```
 
-No additional configuration is required – the library will attach itself to the first `<object>` of the correct type on the page.
+No additional configuration is required – the library will attach itself to **all** `<object>` elements of the correct type found on the page.
 
 ## Usage
 
@@ -70,7 +70,7 @@ The controller object attached to the `<object>` element. All methods are option
 
 | Method | Description |
 |--------|-------------|
-| `setCallback(type, fn)` | Registers a callback function. `type` can be `'zoom'`, `'pan'`, or `'select'`. The callback receives a single argument: for `zoom` the zoom factor, for `pan` an object with `dx` and `dy`, for `select` the selected SVG element (or `null` if deselected). |
+| `setCallback(type, fn)` | Registers a callback function. `type` can be `'zoom'`, `'pan'`, or `'select'`. The callback receives a single argument: for `zoom` the zoom factor, for `pan` an object with `dx` and `dy`, for `select` the `id` string of the selected element (or `null` if deselected). |
 | `toggleFeature(feature, enabled)` | Enable/disable a feature. `feature` can be `'zoom'`, `'pan'`, or `'select'`. `enabled` is a boolean. |
 | `setSelectionColor(color)` | Changes the stroke color used for highlighting selected elements. Default is `'red'`. Accepts any valid CSS color string. |
 | `zoom(factor, clientX, clientY)` | Zooms by `factor` (e.g., `1.2` to zoom in, `0.8` to zoom out) relative to the point `(clientX, clientY)` in viewport coordinates. If coordinates are omitted, zoom is centered on the `<object>` element. |
@@ -90,8 +90,8 @@ The library fires callbacks when user interactions occur (or when you call API m
 ```javascript
 api.setCallback('zoom', (factor) => console.log(`Zoom factor: ${factor}`));
 api.setCallback('pan', (dx, dy) => console.log(`Panned by ${dx}, ${dy}`));
-api.setCallback('select', (element) => {
-  if (element) console.log(`Selected element with id: ${element.id}`);
+api.setCallback('select', (id) => {
+  if (id) console.log(`Selected element with id: ${id}`);
   else console.log('Selection cleared');
 });
 ```
@@ -99,7 +99,7 @@ api.setCallback('select', (element) => {
 ## Important Notes
 
 - **CORS restrictions** – If the SVG is served from a different origin, the script may not be able to access `contentDocument`. Ensure the SVG is served with proper CORS headers or host it on the same domain.
-- **Only one SVG** – The library attaches to the **first** `<object>` element of type `image/svg+xml` found in the DOM. For multiple SVGs, you need to modify the script or instantiate it manually (see advanced section below).
+- **Multiple SVGs supported** – The library attaches to **all** `<object>` elements of type `image/svg+xml` found in the DOM. Each gets its own independent `__SVGControl` instance.
 - **SVG must have IDs** – For element selection to work, the SVG elements you want to select must have an `id` attribute.
 - **Initial viewBox** – If the SVG does not have a `viewBox`, the script will create one based on its bounding box or client dimensions.
 
