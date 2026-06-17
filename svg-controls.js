@@ -7,7 +7,6 @@
     callbacks: { zoom: null, pan: null, select: null }
   };
 
-  // Fix #5: support multiple SVG objects per page
   const run = () => {
     const objects = document.querySelectorAll('object[type="image/xml+svg"], object[type="image/svg+xml"]');
     if (!objects.length) return;
@@ -78,7 +77,6 @@
         zoom: (factor, clientX, clientY) => {
           if (!state.zoomEnabled) return;
           const rect = obj.getBoundingClientRect();
-          // Fix #3: use ?? instead of || to handle clientX/clientY === 0
           const x = clientX ?? rect.left + rect.width / 2;
           const y = clientY ?? rect.top + rect.height / 2;
           const pt = getSvgPoint(x, y);
@@ -92,7 +90,6 @@
         },
         pan: (dx, dy) => {
           if (!state.panEnabled) return;
-          // Fix #6: guard against division by zero
           const clientW = obj.clientWidth || 1;
           const clientH = obj.clientHeight || 1;
           const scaleX = vb.width / clientW;
@@ -125,7 +122,6 @@
           } else {
             selected = null;
           }
-          // Fix #7: pass id string instead of DOM element
           if (state.callbacks.select) state.callbacks.select(selected?.id ?? null);
         },
         reset: () => {
@@ -155,7 +151,6 @@
         panStart = { x: e.clientX, y: e.clientY };
         clickStart = { x: e.clientX, y: e.clientY, time: Date.now() };
         svg.style.cursor = 'grabbing';
-        // Fix #2: call setPointerCapture only once, with existence guard
         if (svg.setPointerCapture) svg.setPointerCapture(e.pointerId);
       };
 
@@ -172,13 +167,9 @@
         if (!panning) return;
         panning = false;
         svg.style.cursor = 'default';
-        // Fix #4: guard releasePointerCapture
         if (svg.releasePointerCapture) svg.releasePointerCapture(e.pointerId);
-        // Fix #1: selection is handled entirely by onClick; no select call here
       };
 
-      // Fix #1: single selection handler using clickTarget captured at pointerdown
-      // Fix #8: consistent 2-space indentation
       const onClick = (e) => {
         const dist = Math.hypot(e.clientX - clickStart.x, e.clientY - clickStart.y);
         const duration = Date.now() - clickStart.time;
